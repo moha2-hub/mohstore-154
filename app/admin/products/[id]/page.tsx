@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { getProductById, updateProduct, createOffer, getOffersByProduct, deleteOffer } from "@/app/actions/products"
+import { getProductById, updateProduct } from "@/app/actions/products"
+import { createOffer, getOffersByProduct, deleteOffer } from "@/app/actions/products-new"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -32,7 +33,14 @@ type Offer = {
 
 export default function EditProductPage() {
   const { t } = useTranslation("common");
-  const { id } = useParams()
+  // UseParams returns Record<string, string | string[]> | null
+  const params = useParams() as Record<string, string | string[]> | null;
+  let id: string | undefined = undefined;
+  if (params && "id" in params) {
+    const raw = params.id;
+    if (typeof raw === "string") id = raw;
+    else if (Array.isArray(raw)) id = raw[0];
+  }
   const router = useRouter()
   const [product, setProduct] = useState<Product | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -128,7 +136,9 @@ export default function EditProductPage() {
     formData.append("description", editOfferForm.description);
     formData.append("quantity", editOfferForm.quantity);
     formData.append("price", editOfferForm.price);
-    const result = await import("@/app/actions/products-new").then(m => m.updateOffer(formData));
+    // Use direct import since updateOffer is now exported
+    const { updateOffer } = await import("@/app/actions/products-new");
+    const result = await updateOffer(formData);
     if (result?.success && product) {
       setEditingOffer(null);
       getOffersByProduct(product.id).then(setOffers);
