@@ -5,7 +5,7 @@ import { Users, Package, ShoppingCart, AlertTriangle } from "lucide-react"
 import { useEffect, useState } from "react"
 import { query } from "@/lib/db"
 import { getFailedAttempts } from "@/lib/login-attempts"
-import { useTranslation } from "react-i18next"
+import { useTranslation } from "@/hooks/use-translation"
 
 export default function AdminDashboard() {
   const { t } = useTranslation("common");
@@ -176,4 +176,3 @@ export default function AdminDashboard() {
 // "visitTopUpsPage": "Visit the Top-ups page to manage pending top-up requests",
 // "visitReclamationsPage": "Visit the Reclamations page to manage pending complaints",
 // "visitUsersPage": "Visit the Users page to manage user roles"
-
