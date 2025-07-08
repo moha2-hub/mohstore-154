@@ -10,7 +10,7 @@ const firebaseConfig = {
   apiKey: 'AIzaSyCxEBWqELTHTzNnDSKFJrhtlOT0MVwaGWE',
   authDomain: 'mohamed145-e59c1.firebaseapp.com',
   projectId: 'mohamed145-e59c1',
-  storageBucket: 'mohamed145-e59c1.firebasestorage.app',
+  storageBucket: 'mohamed145-e59c1.appspot.com', // <-- fixed here
   messagingSenderId: '650058299808',
   appId: '1:650058299808:web:31d77c85d2e93a64d18cc5',
 };
