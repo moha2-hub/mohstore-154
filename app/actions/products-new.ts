@@ -1,3 +1,17 @@
+"use server"
+
+import { query } from "@/lib/db"
+
+// Define an Offer type matching your DB schema
+export type Offer = {
+  id: number
+  product_id: number
+  quantity: number
+  price: number
+  title: string
+  description: string
+}
+
 // Update an offer by ID
 export async function updateOffer(formData: FormData) {
   const id = Number(formData.get("id"));
@@ -18,19 +32,6 @@ export async function updateOffer(formData: FormData) {
     console.error("Update offer error:", error);
     return { success: false, message: "Failed to update offer" };
   }
-}
-"use server"
-
-import { query } from "@/lib/db"
-
-// Define an Offer type matching your DB schema
-export type Offer = {
-  id: number
-  product_id: number
-  quantity: number
-  price: number
-  title: string
-  description: string
 }
 
 // Get all offers for a given product
