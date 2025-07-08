@@ -50,15 +50,20 @@ export async function getOffersByProduct(productId: number): Promise<Offer[]> {
 
 // Create a new offer for a product
 export async function createOffer(formData: FormData) {
-  const productId = Number.parseInt(formData.get("productId") as string)
-  const quantity = Number.parseInt(formData.get("quantity") as string)
-  const price = parseFloat(formData.get("price") as string)
-  // Provide default values for title and description if not present
-  const title = (formData.get("title") as string) || `Offer for ${quantity}+ units`
-  const description = (formData.get("description") as string) || "Quantity-based offer"
+  const productId = Number.parseInt(formData.get("productId") as string);
+  const quantity = Number.parseInt(formData.get("quantity") as string);
+  const price = parseFloat(formData.get("price") as string);
+  const title = (formData.get("title") as string) || `Offer for ${quantity}+ units`;
+  const description = (formData.get("description") as string) || "Quantity-based offer";
 
-  if (!quantity || !price) {
-    return { success: false, message: "Quantity and price are required" }
+  if (
+    isNaN(productId) ||
+    isNaN(quantity) ||
+    isNaN(price) ||
+    quantity <= 0 ||
+    price <= 0
+  ) {
+    return { success: false, message: "Valid product, quantity, and price are required" };
   }
 
   try {
@@ -66,11 +71,11 @@ export async function createOffer(formData: FormData) {
       `INSERT INTO offers (product_id, title, description, quantity, price, is_active, created_at, updated_at)
        VALUES ($1, $2, $3, $4, $5, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) RETURNING id`,
       [productId, title, description, quantity, price],
-    )
-    return { success: true, offerId: result[0].id }
+    );
+    return { success: true, offerId: result[0].id };
   } catch (error) {
-    console.error("Create offer error:", error)
-    return { success: false, message: "Failed to create offer" }
+    console.error("Create offer error:", error);
+    return { success: false, message: "Failed to create offer" };
   }
 }
 
