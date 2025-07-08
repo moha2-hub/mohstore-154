@@ -1,3 +1,24 @@
+// Update an offer by ID
+export async function updateOffer(formData: FormData) {
+  const id = Number(formData.get("id"));
+  const title = (formData.get("title") as string) || "";
+  const description = (formData.get("description") as string) || "";
+  const quantity = Number(formData.get("quantity"));
+  const price = Number(formData.get("price"));
+  if (!id || !title || !description || isNaN(quantity) || isNaN(price)) {
+    return { success: false, message: "All fields are required" };
+  }
+  try {
+    await query(
+      `UPDATE offers SET title = $1, description = $2, quantity = $3, price = $4, updated_at = CURRENT_TIMESTAMP WHERE id = $5`,
+      [title, description, quantity, price, id]
+    );
+    return { success: true };
+  } catch (error) {
+    console.error("Update offer error:", error);
+    return { success: false, message: "Failed to update offer" };
+  }
+}
 "use server"
 
 import { query } from "@/lib/db"
