@@ -7,6 +7,7 @@ import { query } from "@/lib/db"
 import { getFailedAttempts } from "@/lib/login-attempts"
 import { useTranslation } from "react-i18next"
 
+export default function AdminDashboard() {
   const { t } = useTranslation("common");
   const [stats, setStats] = useState({
     products: 0,
@@ -175,4 +176,3 @@ import { useTranslation } from "react-i18next"
 // "visitTopUpsPage": "Visit the Top-ups page to manage pending top-up requests",
 // "visitReclamationsPage": "Visit the Reclamations page to manage pending complaints",
 // "visitUsersPage": "Visit the Users page to manage user roles"
-
