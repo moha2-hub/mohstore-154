@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import React, { useState, useEffect } from 'react';
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { initializeApp, getApps } from 'firebase/app';
 import { registerWithGoogle } from '@/app/actions/auth';
 import { useRouter } from 'next/navigation';
@@ -25,9 +25,17 @@ if (!getApps().length) {
 export default function GoogleSignInButton() {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
-  // No WhatsApp or pendingUser state needed for login
+  const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
   const { t } = useTranslation('common');
+
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const handleSignIn = async () => {
     setMessage('');
@@ -38,6 +46,7 @@ export default function GoogleSignInButton() {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       // Check if user exists in your DB
+      // @ts-expect-error: checkOnly is a custom flag for backend logic
       const res = await registerWithGoogle({
         email: user.email || '',
         displayName: user.displayName || undefined,
@@ -83,25 +92,52 @@ export default function GoogleSignInButton() {
     setLoading(false);
   };
 
+  const handleSignOut = async () => {
+    const auth = getAuth();
+    await signOut(auth);
+    setMessage('Signed out successfully');
+  };
+
   // No WhatsApp submit handler for login
 
   return (
     <div>
-      <button
-        onClick={handleSignIn}
-        disabled={loading}
-        style={{
-          background: '#fff',
-          color: '#444',
-          border: '1px solid #ccc',
-          padding: '10px 20px',
-          borderRadius: '4px',
-          cursor: 'pointer',
-          fontWeight: 'bold',
-        }}
-      >
-        {loading ? t('loading') : t('signIn')}
-      </button>
+      {user ? (
+        <>
+          <div>Welcome, {(user as User).displayName || (user as User).email}!</div>
+          <button
+            onClick={handleSignOut}
+            style={{
+              background: '#fff',
+              color: '#444',
+              border: '1px solid #ccc',
+              padding: '10px 20px',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              marginTop: 8,
+            }}
+          >
+            {t('signOut') || 'Sign Out'}
+          </button>
+        </>
+      ) : (
+        <button
+          onClick={handleSignIn}
+          disabled={loading}
+          style={{
+            background: '#fff',
+            color: '#444',
+            border: '1px solid #ccc',
+            padding: '10px 20px',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+          }}
+        >
+          {loading ? t('loading') : t('signIn')}
+        </button>
+      )}
       <div id="auth-message" style={{ marginTop: 12, color: message.startsWith('Error') ? 'red' : 'green' }}>{message}</div>
     </div>
   );
